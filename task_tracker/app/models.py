@@ -10,7 +10,7 @@ class Task(models.Model):
     )
 
     name = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     deadline = models.DateTimeField()
     is_complete = models.BooleanField(default=False)
     priority = models.CharField(
@@ -32,6 +32,9 @@ class Task(models.Model):
 class TaskType(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class Worker(AbstractUser):
     position = models.ForeignKey(
@@ -43,3 +46,6 @@ class Worker(AbstractUser):
 
 class Position(models.Model):
     name = models.CharField(max_length=70)
+
+    def __str__(self):
+        return self.name
