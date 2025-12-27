@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>
+    <strong>Task name:</strong> {{ object.name }}
+    {% if object.is_complete %}
+      <span style="color: green;">(Completed)</span>
+    {% else %}
+      <span style="color: orange;">(In progress)</span>
+    {% endif %}
+  </h1>
+
+  <h3 style="color: red;">
+    Deadline: {{ object.deadline }}
+  </h3>
+
+  <h4>Priority: {{ object.get_priority_display }}</h4>
+
+  <h4>
+    Task type:
+    {% if object.task_type %}
+      {{ object.task_type.name }}
+    {% else %}
+      <em>No type</em>
+    {% endif %}
+  </h4>
+
+  <hr>
+
+  <h4>Description:</h4>
+  <p><i>{{ object.description }}</i></p>
+
+  <hr>
+
+  <h4>Assignees:</h4>
+  <ul>
+    {% for worker in object.assignees.all %}
+      <li>{{ worker.username }}</li>
+    {% empty %}
+      <li><em>No assignees</em></li>
+    {% endfor %}
+  </ul>
+
+  <hr>
+
+<a href="{% url 'app:tasks' %}" class="btn btn-secondary">
+  ← Back to tasks
+</a>
+
+<a href="{% url 'app:tasks-update' object.id  %}" class="btn btn-success link-to-form">
+    Update
+</a>
+
+<a href="{% url 'app:tasks-delete' object.id  %}" class="btn btn-danger link-to-form">
+    Delete
+</a>
+
+{% endblock %}
