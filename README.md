@@ -24,35 +24,6 @@ The project demonstrates clean Django architecture, CRUD operations, and basic a
 
 ---
 
-## 🗂 Project Structure
-
-task-tracker/
-├── app/
-│ ├── admin.py
-│ ├── apps.py
-│ ├── forms.py
-│ ├── models.py
-│ ├── views.py
-│ ├── urls.py
-│ ├── tests.py
-│ └── templatetags/
-│ └── query_transform.py
-├── task_tracker/
-│ ├── settings.py
-│ ├── urls.py
-│ ├── wsgi.py
-│ └── asgi.py
-├── templates/
-│ ├── base.html
-│ ├── registration/
-│ └── app/
-├── static/
-│ └── css/
-├── manage.py
-└── db.sqlite3
-
----
-
 ## 🛠 Tech Stack
 
 - Python 3
