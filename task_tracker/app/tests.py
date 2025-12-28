@@ -3,7 +3,11 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
+from .forms import WorkerCreationForm, WorkerUpdateForm
 from .models import Task, TaskType, Position
+
+
+User = get_user_model()
 
 
 class ModelStrTests(TestCase):
@@ -20,7 +24,7 @@ class ModelStrTests(TestCase):
 class TaskModelTests(TestCase):
 
     def test_task_assignees(self):
-        user = get_user_model().objects.create_user(
+        user = User.objects.create_user(
             username="john",
             password="pass"
         )
@@ -43,7 +47,7 @@ class BaseViewTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.user = get_user_model().objects.create_user(
+        cls.user = User.objects.create_user(
             username="testuser",
             password="password"
         )
@@ -95,7 +99,7 @@ class TaskCreateViewTests(BaseViewTest):
     def test_task_create(self):
         task_type = TaskType.objects.create(name="Feature")
 
-        worker = get_user_model().objects.create_user(
+        worker = User.objects.create_user(
             username="worker",
             password="pass"
         )
@@ -142,3 +146,112 @@ class LoginRequiredTests(TestCase):
     def test_tasks_requires_login(self):
         response = self.client.get(reverse("app:tasks"))
         self.assertEqual(response.status_code, 302)
+
+
+class WorkerCreationFormTests(TestCase):
+    def setUp(self):
+        self.position = Position.objects.create(name="Driver")
+
+    def test_valid_worker_creation_form(self):
+        form_data = {
+            "username": "john_doe",
+            "password1": "StrongPassword123!",
+            "password2": "StrongPassword123!",
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "JOHN@EXAMPLE.COM",
+            "position": self.position.id,
+        }
+
+        form = WorkerCreationForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+        user = form.save()
+
+        self.assertEqual(user.email, "john@example.com")
+        self.assertEqual(user.position, self.position)
+        self.assertTrue(User.objects.filter(username="john_doe").exists())
+
+    def test_duplicate_email_not_allowed(self):
+        User.objects.create_user(
+            username="existing_user",
+            password="test12345",
+            email="test@example.com"
+        )
+
+        form_data = {
+            "username": "new_user",
+            "password1": "StrongPassword123!",
+            "password2": "StrongPassword123!",
+            "email": "test@example.com",
+        }
+
+        form = WorkerCreationForm(data=form_data)
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("email", form.errors)
+        self.assertEqual(
+            form.errors["email"][0],
+            "A user with this email already exists."
+        )
+
+
+class WorkerUpdateFormTests(TestCase):
+    def setUp(self):
+        self.position = Position.objects.create(name="Manager")
+
+        self.user = User.objects.create_user(
+            username="user1",
+            password="test12345",
+            email="user1@example.com",
+            position=self.position,
+        )
+
+        self.other_user = User.objects.create_user(
+            username="user2",
+            password="test12345",
+            email="user2@example.com",
+        )
+
+    def test_user_can_update_own_data(self):
+        form_data = {
+            "username": "user1",
+            "first_name": "Updated",
+            "last_name": "Name",
+            "email": "user1@example.com",
+            "position": self.position.id,
+        }
+
+        form = WorkerUpdateForm(instance=self.user, data=form_data)
+
+        self.assertTrue(form.is_valid())
+
+        user = form.save()
+        self.assertEqual(user.first_name, "Updated")
+
+    def test_user_can_keep_own_email(self):
+        form_data = {
+            "username": "user1",
+            "email": "user1@example.com",
+            "position": self.position.id,
+        }
+
+        form = WorkerUpdateForm(instance=self.user, data=form_data)
+
+        self.assertTrue(form.is_valid())
+
+    def test_duplicate_email_not_allowed_on_update(self):
+        form_data = {
+            "username": "user1",
+            "email": "user2@example.com",
+            "position": self.position.id,
+        }
+
+        form = WorkerUpdateForm(instance=self.user, data=form_data)
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("email", form.errors)
+        self.assertEqual(
+            form.errors["email"][0],
+            "A user with this email already exists."
+        )
