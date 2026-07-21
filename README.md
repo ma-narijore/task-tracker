@@ -34,6 +34,14 @@ The project demonstrates clean Django architecture, CRUD operations, and basic a
 
 ---
 
+## Test User
+```bash
+username: admin
+password: 1qazcde3
+```
+
+---
+
 ## 📦 Installation & Setup
 
 1. Clone the repository:
@@ -68,6 +76,6 @@ The project demonstrates clean Django architecture, CRUD operations, and basic a
 
     ```cpp
     http://127.0.0.1:8000/
-8. 🧪 Running Tests
+8.  Running Tests
     ```bash
     python manage.py test
