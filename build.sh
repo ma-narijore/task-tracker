@@ -3,6 +3,6 @@ set -o errexit
 
 pip install -r requirements.txt
 
-python task_tracker/manage.py collectstatic --no-input
+python manage.py collectstatic --no-input
 
-python task_tracker/manage.py migrate
+python manage.py migrate
