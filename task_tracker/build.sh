@@ -15,3 +15,21 @@ User.objects.filter(username='admin').exists() or User.objects.create_superuser(
     'admin@example.com',
     '1qazcde3'
 )"
+
+python manage.py shell -c "
+from app.models import TaskType
+
+for name in [
+    'Bug',
+    'Feature',
+    'Improvement',
+    'Documentation',
+    'Testing',
+    'Code Review',
+    'Refactoring',
+    'Research',
+    'Deployment',
+    'Maintenance',
+]:
+    TaskType.objects.get_or_create(name=name)
+"
